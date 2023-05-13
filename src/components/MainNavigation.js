@@ -51,7 +51,7 @@ function MainNavigation() {
       <nav
         className={`max-lg:nav-bar  justify-between  absolute top-0 bg-black  text-white items-center w-full flex text-[16px] p-5 shadow shadow-slate-800 `}
       >
-        <section className="flex justify-center gap-5 items-center mr-5 lg:flex-[0.5]">
+        <section className="flex  gap-5 items-center mr-5 lg:flex-[0.5]">
           <h3 className="cursor-pointer mx-2 mr-4 font-medium text-lg">
             <NavLink to={".."} className="flex items-center gap-1">
               <motion.section
