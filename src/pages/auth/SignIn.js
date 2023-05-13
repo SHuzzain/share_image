@@ -148,10 +148,10 @@ function SignIn() {
   };
 
   return (
-    <div className="h-screen flex justify-center bg-white">
-      <div className="mix-w-[50rem] min-w-[30rem] items-center p-16 h-[45rem] flex flex-col">
+    <div className="h-screen flex justify-center bg-white items-center">
+      <div className="max-w-full md:mix-w-[50rem] md::min-w-[auto] p-2 items-center max-h-[45rem] min-h-[auto]  flex flex-col justify-center">
         <section className="flex flex-col gap-3 w-full">
-          <h2 className="my-6 font-semibold text-base">Shareme</h2>
+          <h2 className="my-2 font-semibold text-base">Shareme</h2>
           <h2 className="font-bold text-3xl">{searPathMode.pathMode.name}</h2>
           <p className="text-gray-500 text-xs font-medium mb-3 text-center">
             {isLogin
@@ -169,14 +169,18 @@ function SignIn() {
           <p>Sign up with Google</p>
         </section>
 
-        <p className="my-10 font-medium text-[12px] text-gray-500">
-          ______________________ or {searPathMode.pathMode.name} with
-          Email________________________
-        </p>
+        <section className="max-h-[20rem] min-h-[auto] my-4 font-medium text-[12px] gap-1 text-gray-500 flex items-center w-full">
+          <p className="w-full h-[0.7px] bg-gray-500" />{" "}
+          <span className="whitespace-nowrap">
+            {" "}
+            or {searPathMode.pathMode.name} with Email
+          </span>
+          <p className="w-full h-[0.7px] bg-gray-500" />
+        </section>
 
         <form
           onSubmit={handleSumbit}
-          className="w-full flex flex-col gap-3 [&>label>input]:loginForm font-medium"
+          className="w-full flex [&>label>p]:text-sm [&>label>section>p]:text-sm  flex-col gap-3 [&>label>input]:loginForm font-medium"
         >
           {!isLogin && (
             <label htmlFor="name" className="sign_user">
@@ -219,9 +223,9 @@ function SignIn() {
 
           {!isLogin && (
             <label htmlFor="terms">
-              <section className="flex gap-2">
+              <section className="flex gap-2 ">
                 <input
-                  className="w-4 cursor-pointer"
+                  className="w-3 cursor-pointer"
                   type="checkbox"
                   name=""
                   id="terms"
@@ -253,8 +257,8 @@ function SignIn() {
             )}
           </button>
         </form>
-        <section className="w-full text-start mt-3">
-          <p className="[&>a]:text-blue-500 [&>a]:font-medium [&>a]:text-[16px]">
+        <section className="w-full text-start mt-3 ">
+          <p className="[&>a]:text-blue-500 [&>a]:font-medium text-sm">
             {searPathMode.pathMode.message}
             <Link to={`?mode=${isLogin ? "signUp" : "signIn"}`}>
               {!isLogin ? " SignIn" : " SignUp"}
