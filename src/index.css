@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components{
+  .nav_btn{
+    @apply relative before:absolute before:w-0 before:transition-all before:ease-in-out before:duration-200 hover:before:w-full before:bottom-0 before:h-[2px] before:bg-yellow-300 max-lg:before:bg-white
+  }
+  .nav_btn_active{
+    @apply relative before:absolute before:w-full before:bottom-0 before:h-[2px] before:bg-white lg:before:bg-red-600 text-[#949494]
+  }
+  .nav-bar{
+       @apply justify-between
+  }
+  .nav_leftProfileIcon{
+    @apply w-12 rounded-full  relative h-12 group-hover:-translate-y-6 transition-all group-hover:duration-200 delay-75 [&:not(:hover)]:delay-200 bg-gray-600
+  }
+  .aside_nav{
+    @apply transition-all duration-200 fixed top-0 left-0 flex flex-col bg-[#000000b3] h-full justify-start gap-0 items-start
+  }
+  .aside_nav > li {
+    @apply w-full p-5 first:mt-8 hover:bg-[#000000ea]
+  }
+ 
+  .loginForm{
+    @apply p-2 w-full outline-blue-500 rounded-full border-[3px] border-[#e9e8f1]
+  }
+  .create-section{
+    @apply bg-gray-300 w-full p-2 group-focus:scale-[1.02] rounded-lg outline-none font-medium text-[1rem]
+  }
+  .prodect_section{
+    @apply flex  items-center gap-1 
+  }
+  .profilePage_postSection{
+    @apply max-md:text-[20px] max-md:font-medium hover:bg-gray-300 transition-all duration-200 ease-linear hover:text-[#1e1d1d] cursor-pointer
+  }
+  .profilePage_top{
+    @apply flex-col items-center
+  }
+  .profilePage_top > section{
+    @apply items-start 
+  }
+  .profilePage_postDetail{
+    @apply w-full flex justify-center items-center
+  }
+  .profilePage_postDeatil{
+   @apply bg-blue-500 capitalize w-full rounded-md active:bg-blue-300 hover:text-[#cdcdcd] transition-all duration-200
+  }
+  .publicePage_bookmark_btn{
+    @apply w-14 h-9 max-[1400px]:w-10 max-[1400px]:h-8 cursor-pointer  rounded-lg font-bold  bg-yellow-300 text-black
+  }
+
+}
+
+*, html, body{
+  box-sizing: border-box;
+  
+}
+html,
+body{
+  scroll-behavior: smooth;
+  max-width: auto;
+  overflow: auto;
+}
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+   background-color: black;
+   
+}
+
+::-webkit-scrollbar{
+  display: none;
+}
+
+img {
+  pointer-events: none;
+  
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
