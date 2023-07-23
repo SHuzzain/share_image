@@ -148,8 +148,8 @@ function SignIn() {
   };
 
   return (
-    <div className="h-screen flex justify-center bg-white items-center">
-      <div className="max-w-full md:mix-w-[50rem] md::min-w-[auto] p-2 items-center max-h-[45rem] min-h-[auto]  flex flex-col justify-center">
+    <div className="h-screen  bg-white px-2 py-1">
+      <div className="min-w-[auto] max-w-[25rem] mx-auto  items-center  flex flex-col justify-center">
         <section className="flex flex-col gap-3 w-full">
           <h2 className="my-2 font-semibold text-base">Shareme</h2>
           <h2 className="font-bold text-3xl">{searPathMode.pathMode.name}</h2>

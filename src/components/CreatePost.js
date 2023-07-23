@@ -132,13 +132,11 @@ function CreatePost() {
 
   const handleFileReader = async (e) => {
     if (!e.target.files) {
-      console.log("url");
       setPost((preVal) => ({
         ...preVal,
         url: e.target.value,
       }));
     } else {
-      console.log("file");
       try {
         const file = e.target.files[0];
         if (file.size > 1000000) {
@@ -182,14 +180,14 @@ function CreatePost() {
         <section className="col-span-3 sm:col-span-1 h-56 bg-gray-300 rounded-lg overflow-hidden">
           <label
             htmlFor="imageUrl"
-            className="w-full h-full grid place-items-center"
+            className="w-full h-full flex items-center justify-center"
           >
             {!post.url ? (
-              <h3 className="absolute uppercase font-medium">image url</h3>
+              <h3 className="uppercase font-medium">image url</h3>
             ) : (
               <img
                 src={post.url}
-                className="object-cover h-full w-full"
+                className="object-contain h-full w-full"
                 alt=""
                 id="imageUrl"
               />
@@ -260,7 +258,7 @@ function CreatePost() {
               type="file"
               hidden
             />
-            <button
+            <section
               className={`${
                 post.caption.length || post.title.length || post.url.length
                   ? "gap-2"
@@ -270,14 +268,16 @@ function CreatePost() {
               {post.caption.length ||
               post.title.length ||
               post.url.length ? null : (
-                <span
+                <button
+                  type="button"
                   className="absolute h-full w-full flex items-center justify-center"
                   onClick={() => fileRef.current.click()}
                 >
                   select from computer
-                </span>
+                </button>
               )}
-              <span
+              <button
+                type="button"
                 className={`${
                   post.caption.length || post.title.length || post.url.length
                     ? "rounded"
@@ -288,8 +288,9 @@ function CreatePost() {
                 {post.caption.length || post.title.length || post.url.length
                   ? "select.."
                   : null}
-              </span>
-              <span
+              </button>
+              <button
+                type="reset"
                 className={`${
                   post.caption.length || post.title.length || post.url.length
                     ? "rounded bg-red-600"
@@ -304,8 +305,8 @@ function CreatePost() {
                 {post.caption.length || post.title.length || post.url.length
                   ? "Clear"
                   : null}
-              </span>
-            </button>
+              </button>
+            </section>
             <button
               disabled={loading}
               type="submit"

@@ -100,17 +100,15 @@ function MainNavigation() {
             className={`max-w-[18rem] min-w-[auto] rounded-full `}
           >
             <section
-              className={`flex items-center  transition-all duration-500 cursor-pointer ${
-                searchToggle ? "w-full" : "w-14"
-              } relative shadow-yellow-300 shadow-sm rounded-full `}
+              className={`flex items-center  transition-all duration-500 cursor-pointer ${searchToggle ? "w-full" : "w-14"
+                } relative shadow-yellow-300 shadow-sm rounded-full `}
             >
               <MagnifyingGlassIcon
                 onClick={handleSearchToggle}
-                className={`w-14 text-xl p-2 h-10 ${
-                  searchToggle
-                    ? "rounded-bl-none rounded-tl-none "
-                    : "shadow-sm shadow-yellow-300 ml-auto"
-                } right-0 rounded-full absolute  bg-black text-white font-bold `}
+                className={`w-14 text-xl p-2 h-10 ${searchToggle
+                  ? "rounded-bl-none rounded-tl-none "
+                  : "shadow-sm shadow-yellow-300 ml-auto"
+                  } right-0 rounded-full absolute  bg-black text-white font-bold `}
               />
               <input
                 onChange={(e) => handleChangeInput(e)}
@@ -202,9 +200,8 @@ function MainNavigation() {
 
             <aside className="max-lg:aside_nav lg:hidden">
               <ul
-                className={`[&>*]:cursor-pointer max-lg:aside_nav lg:translate-x-0 ${
-                  asideNav ? "translate-x-0 w-[40%]" : "-translate-x-[100%]"
-                } flex justify-between items-center gap-8 capitalize font-medium`}
+                className={`[&>*]:cursor-pointer max-lg:aside_nav lg:translate-x-0 ${asideNav ? "translate-x-0 w-[40%]" : "-translate-x-[100%]"
+                  } flex justify-between items-center gap-8 capitalize font-medium`}
               >
                 <li>
                   {" "}
