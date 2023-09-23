@@ -8,8 +8,19 @@ import { arrayRemove, arrayUnion, collection, doc, getDocs, onSnapshot, query, u
 import { db } from "../../firebase";
 import { useSelector } from "react-redux";
 import { userInfo } from "../../feature/userSlice";
+import { FormProvider, useForm } from "react-hook-form";
 function ChatPlace({ contectDetail, currentState, setContectDetail }) {
   const [userInput, setUserInput] = useState("");
+  const methods = useForm({
+    mode: 'onChange',
+    shouldUnregister: false,
+    defaultValues: {
+      mainCheckBox: false,
+    }
+  })
+  const { getValues, setValue, watch, reset } = methods
+  const watchValue = watch('DeleteMessageData')
+  const watchCheck = watch('mainCheckBox')
   const chatBoxRef = useRef(null);
   const selector = useSelector(userInfo);
   const [checkBox, setCheckBox] = useState({
@@ -22,29 +33,22 @@ function ChatPlace({ contectDetail, currentState, setContectDetail }) {
   const fetchData = async () => {
     if (contectDetail) {
       try {
-        const collectionRef = collection(db, 'user')
-        const queryData = query(collectionRef, where('contectUser', 'in', [contectDetail?.cominatedId]))
-        onSnapshot(doc(db, 'chats', contectDetail?.cominatedId), async snapshot => {
-          setChatBox(snapshot?.data()?.messages)
-          chatBoxRef?.current?.scrollIntoView()
-        })
-        const getDocsData = await getDocs(queryData)
-        console.log(getDocsData.docs)
-        getDocsData.docs.map((data) => {
-          console.log(getDocsData.docs)
+        onSnapshot(doc(db, 'userChat', contectDetail?.cominatedId), async snapshot => {
+          setValue('admin', snapshot?.data()?.createrId)
+          const currentChat = snapshot?.data()?.createrId === selector?.uid ? snapshot?.data()?.user1 : snapshot?.data()?.user2
+          const jsonArrayString = `[${currentChat?.join(',')}]`;
+          setChatBox(JSON.parse(jsonArrayString))
         })
       } catch (error) {
         console.log(error)
       }
-
     }
   }
 
   useEffect(() => {
-
     fetchData()
-    chatBoxRef?.current?.scrollIntoView()
   }, [contectDetail]);
+
   useEffect(() => {
     if (!currentState && contectDetail) {
       if (window?.innerWidth <= 768) {
@@ -53,84 +57,58 @@ function ChatPlace({ contectDetail, currentState, setContectDetail }) {
       }
     }
   }, [currentState])
+
   const handleInput = async (e) => {
     e.preventDefault();
-    if (userInput.trim() == "") return null;
-    const newData = {
-      userType: selector?.uid,
-      id: uuidv4(),
-      mesgInfo: {
-        msg: {
-          user1: userInput,
-          user2: userInput,
-        },
-        date: new Date().toISOString(),
-      },
-    };
-    await updateDoc(doc(db, 'chats', contectDetail?.cominatedId), {
-      messages: arrayUnion({ ...newData })
+    if (userInput.trim() == "" || !contectDetail?.cominatedId) return null;
+    let id = uuidv4()
+    const newMessage = [id, {
+      id,
+      uid: selector?.uid,
+      message: userInput,
+      date: new Date().toISOString(),
+    }]
+    await updateDoc(doc(db, 'userChat', contectDetail?.cominatedId), {
+      user1: arrayUnion(JSON.stringify(newMessage)),
+      user2: arrayUnion(JSON.stringify(newMessage))
     })
+    chatBoxRef?.current?.scrollIntoView()
     setUserInput("");
   };
 
   const handleMsgCheckCount = (value) => {
-    if (value?.bool && value?.checked) {
-      const newArray = {
-        id: value?.id,
-        place: value?.place
-      }
-      checkBox.selectedData.push(newArray)
-      setCheckBox({ ...checkBox })
+    if (watchCheck && value?.checked) {
+      setValue('DeleteMessageData', watchValue ? [...watchValue, value?.id] : [value?.id]);
     } else {
-      if (checkBox.selectedData.length) {
-        const newArray = checkBox.selectedData.filter((item) => item?.id !== value?.id)
-        checkBox.selectedData = [...newArray]
-        setCheckBox(checkBox)
+      if (watchValue?.length) {
+        const deleteSetFn = new Set(watchValue)
+        deleteSetFn.delete(value?.id)
+        setValue('DeleteMessageData', Array.from(deleteSetFn.values()))
       }
     }
   }
 
   const handleDeleteMsg = async () => {
+    if (watchValue.length) {
+      const createrId = getValues('admin');
+      const chatMap = new Map(chatBox);
+      const selectedData = new Set(watchValue);
 
-    if (checkBox.selectedData.length) {
-      const updatedArray = await Promise.all(chatBox.map(async item => {
-        const newItem = checkBox.selectedData.find(newItem => newItem.id === item.id);
-        if (newItem) {
-          const emptyItem = item.userType === selector.uid ? item.mesgInfo.msg.user1 === null : item.mesgInfo.msg.user2 === null;
-          if (emptyItem) {
-            await updateDoc(doc(db, 'chats', contectDetail.cominatedId), {
-              messages: arrayRemove(item)
-            }).catch((e) => console.log(e));
-            return null; // Return null to filter out the item from the array
-          } else {
-            return {
-              ...item,
-              mesgInfo: {
-                ...item.mesgInfo,
-                msg: {
-                  ...item.mesgInfo.msg,
-                  [`user${item.userType === selector.uid ? 2 : 1}`]: null // or any other value you want to set for user2
-                }
-              }
-            };
-          }
-        }
-        return item;
-      }));
+      const currentChat = Array.from(selectedData)
+        .filter(value => chatMap.has(value))
+        .map(value => JSON.stringify([value, chatMap.get(value)]));
 
-      const filteredArray = updatedArray.filter(item => item !== null); // Filter out the null items
-
-      await updateDoc(doc(db, 'chats', contectDetail.cominatedId), {
-        messages: filteredArray
+      await updateDoc(doc(db, 'userChat', contectDetail.cominatedId), {
+        [`user${createrId === selector?.uid ? '1' : '2'}`]: arrayRemove(...currentChat)
       });
-      checkBox.checkBox = false
-      checkBox.selectedData = []
-      setCheckBox(checkBox)
+      setValue('DeleteMessageData', [])
     }
   }
 
+
+
   return (
-    <div className={`flex-1 flex flex-col w-full max-md:absolute transition-transform max-md:translate-x-full ${!contectDetail ? 'max-md:translate-x-full' : 'max-md:translate-x-0 bg-slate-400'} max-md:h-full`}>
+    <div className={`flex-1 flex flex-col w-full max-md:absolute transition-transform bg-slate-400 ${contectDetail ? 'max-md:translate-x-0' : 'max-md:translate-x-full'}  max-md:h-full`}>
       <header className="flex items-center bg-slate-300 justify-between p-2 ">
         <section className="flex items-center gap-3">
           {!contectDetail?.photoUrl ?
@@ -140,18 +118,20 @@ function ChatPlace({ contectDetail, currentState, setContectDetail }) {
           <h5 className="font-medium">{contectDetail?.displayName}</h5>
         </section>
         <label htmlFor="checkbox" className="flex items-center gap-2">
-          <input id="checkbox" type="checkbox" value={checkBox.checkBox} onChange={(e) => setCheckBox(preVal => ({ ...preVal, checkBox: e.target.checked }))} className="hidden peer " />
+          <input id="checkbox" type="checkbox" value={checkBox.checkBox} onChange={({ target }) => setValue('mainCheckBox', target.checked)} className="hidden peer " />
           <TrashIcon onClick={handleDeleteMsg} className="w-7 bg-slate-200 text-red-400 translate-x-9 rounded-lg p-1 peer-checked:translate-x-0 shadow peer-checked:shadow-red-400 transition-all duration-200 ease-in-out" />
           <CheckIcon className="w-7 bg-slate-200 peer-checked:bg-yellow-300 z-10 rounded-lg text-gray-400 p-1 shadow shadow-gray-400 transition-colors duration-200 ease-in-out peer-checked:text-black" />
         </label>
       </header>
+      <FormProvider {...methods}>
+        <div className="flex-1 px-2 py-3 overflow-y-auto scroll-smooth ">
+          {chatBox?.map(([id, items], index) => (
+            <ChatMsg handleMsgCheckCount={handleMsgCheckCount} userType={items?.uid} currentUSer={selector?.uid} id={id} msgCheckBox={checkBox.checkBox} index={index} mesgInfo={items?.message} key={index} />
+          ))}
+          <div ref={chatBoxRef} className="text-xs text-black/50 text-center invisible ">All message are encrypted</div>
+        </div>
+      </FormProvider>
 
-      <div className="flex-1 px-2 py-3 overflow-y-auto scroll-smooth ">
-        {chatBox?.map((items, index) => (
-          <ChatMsg currentUSer={selector?.uid} handleMsgCheckCount={handleMsgCheckCount} id={items?.id} msgCheckBox={checkBox.checkBox} index={index} mesgInfo={items?.mesgInfo} userType={items?.userType} key={index} />
-        ))}
-        <div ref={chatBoxRef} className="text-xs text-black/50 text-center invisible mt-8">All message are encrypted</div>
-      </div>
 
       <Form
         onSubmit={handleInput}

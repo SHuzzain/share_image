@@ -61,7 +61,7 @@ export const MessageAside = () => {
             </header>
             <ContactList setChatplaceToggle={setChatplaceToggle} handleChat={handleChat} setInput={setInput} searchInput={searchInput} />
           </aside>
-          <ArrowToggle toggle={setMTogglem} currentState={mTogglem} />
+          <ArrowToggle toggle={setMTogglem} contectDetail={contectDetail} setContectDetail={setContectDetail} currentState={mTogglem} />
         </div>
 
         <ChatPlace currentState={mTogglem} contectDetail={contectDetail} setContectDetail={setContectDetail} />

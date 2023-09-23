@@ -17,13 +17,13 @@ function SignIn() {
   const searPathMode = {
     pathMode: !isLogin
       ? {
-          name: "Sign Up",
-          message: "Already have account?",
-        }
+        name: "Sign Up",
+        message: "Already have account?",
+      }
       : {
-          name: "Sign In",
-          message: "i don't have account?",
-        },
+        name: "Sign In",
+        message: "i don't have account?",
+      },
   };
 
   const [formInput, setFormeInput] = useState({
@@ -40,7 +40,7 @@ function SignIn() {
       case true:
         // login handle
         if (!formInput.email || !formInput.password) {
-          console.log(formInput);
+
           alert("please fill the empty field");
         } else {
           try {
@@ -103,7 +103,6 @@ function SignIn() {
                 photoUrl: "",
                 online: true,
                 bookmark: [],
-                contectUser: [],
                 timestamp: serverTimestamp(),
               });
             })

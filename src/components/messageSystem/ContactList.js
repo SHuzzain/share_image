@@ -1,9 +1,10 @@
-import { arrayUnion, collection, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
 import React from "react";
 import { useEffect } from "react";
 import { db } from "../../firebase";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { v4 as uuidv4 } from 'uuid';
 import { userInfo } from "../../feature/userSlice";
 import Loading from 'react-loading'
 function ContactList({ searchInput, setInput, handleChat }) {
@@ -15,6 +16,10 @@ function ContactList({ searchInput, setInput, handleChat }) {
 
   const getDataSearch = async () => {
     setLoading(true)
+    const hasId = contectList?.some(user => {
+      return user?.displayName === searchInput
+    })
+    if (hasId) return setLoading(false)
     const collectionRef = collection(db, 'user')
     const queryData = query(collectionRef, where("displayName", '==', searchInput))
     const getDocsData = await getDocs(queryData)
@@ -29,43 +34,57 @@ function ContactList({ searchInput, setInput, handleChat }) {
 
 
   useEffect(() => {
-    const getListContact = async () => {
-      if (selector?.uid) {
-        onSnapshot(doc(db, 'user', selector?.uid), async snapshot => {
-          setContectList(snapshot?.data()?.contectUser)
-        })
-      }
+    try {
+      const getListContact = async () => {
+        if (selector?.uid) {
+          const userDocRef = doc(db, `user/${selector?.uid}`);
+          const contactUserCollectionRef = collection(userDocRef, "contactUser");
+          onSnapshot(contactUserCollectionRef, async snapshot => {
+            let contactList = [];
+            snapshot?.forEach((doc) => {
+              contactList.push(doc?.data())
+            })
+            setContectList([...contactList])
+          })
 
+        }
+      }
+      getListContact()
+    } catch (error) {
+      console.error(error)
     }
-    getListContact()
   }, [selector?.uid])
 
   const handleAddContact = async (data) => {
-    if (selector?.uid) {
-      setLoading(true)
-      delete data?.timestamp
-      const cominatedId = data?.uid > selector?.uid ? data?.uid + selector?.uid : selector?.uid + data?.uid
-      setSearchContectList([])
-      await updateDoc(doc(db, "user", selector?.uid), {
-        contectUser: arrayUnion({
-          ...data,
-          lastSeen: NaN,
-          lastMessage: '',
-          cominatedId,
-        })
-      });
 
-      const res = await getDoc(doc(db, 'chats', cominatedId))
-      if (!res.exists()) {
-        await setDoc(doc(db, 'chats', cominatedId), {
-          senderMessages: [],
-          receiverMessages: [],
-        }).catch(e => {
-          console.log(e)
-        })
+    try {
+      if (selector?.uid) {
+        if (selector?.uid === data?.uid) return null;
+        setLoading(true)
+        const cominatedId = data?.uid > selector?.uid ? data?.uid + selector?.uid : selector?.uid + data?.uid
+        setSearchContectList([])
+        await setDoc(doc(db, `user/${selector?.uid}/contactUser`, cominatedId), {
+          displayName: data?.displayName,
+          email: data?.email,
+          uid: data?.uid,
+          cominatedId,
+          photoUrl: ''
+        });
+        const exitsChat = await getDoc(doc(db, 'userChat', cominatedId))
+        if (!exitsChat.exists()) {
+          await setDoc(doc(db, 'userChat', cominatedId), {
+            createrId: selector?.uid,
+            user1: [],
+            user2: [],
+          })
+        }
+        setLoading(false)
+        setInput('')
       }
+    } catch (error) {
       setLoading(false)
       setInput('')
+      console.error(error)
     }
   }
   return (
