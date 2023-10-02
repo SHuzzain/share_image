@@ -1,3 +1,6 @@
+:root {
+  --rotate-deg: 168deg;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,7 +26,7 @@
   }
 
   .loginForm {
-    @apply p-2 w-full outline-blue-500 rounded-full border-[3px] border-[#e9e8f1];
+    @apply p-2 w-full rounded-full border-[3px] border-[#e9e8f1];
   }
   .create-section {
     @apply bg-gray-300 w-full p-2 group-focus:scale-[1.02] rounded-lg outline-none font-medium text-[1rem];
@@ -70,6 +73,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: black;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
 }
 
 ::-webkit-scrollbar {
