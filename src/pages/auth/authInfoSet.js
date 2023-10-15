@@ -1,8 +1,4 @@
 import { redirect } from "react-router-dom";
-import { realtimeDb } from "../../firebase";
-import { userInfo } from "../../feature/userSlice";
-import { useSelector } from "react-redux";
-import { onDisconnect, ref } from "firebase/database";
 
 
 export const getAuthExpirationData = () => {
@@ -26,19 +22,12 @@ export const getAuthToken = () => {
   return token
 }
 
-const Check = () => {
-  return useSelector(userInfo);
-}
 
 
 export const checkUserToken = (sts) => {
-  const selector = Check()
+
   const token = getAuthToken()
   if (!token || token === 'EXPIRED') {
-    const presenceRef = ref(realtimeDb, "oflline");
-    onDisconnect(presenceRef).set(ref(realtimeDb, 'users/' + selector?.uid), {
-      online: false
-    });
     if (sts === 'onlyCheck') {
       return null
     } else {
