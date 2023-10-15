@@ -1,10 +1,9 @@
-import { arrayUnion, collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot, query, setDoc, where } from "firebase/firestore";
 import React from "react";
 import { useEffect } from "react";
 import { db } from "../../firebase";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { v4 as uuidv4 } from 'uuid';
 import { userInfo } from "../../feature/userSlice";
 import Loading from 'react-loading'
 function ContactList({ searchInput, setInput, handleChat }) {
@@ -70,21 +69,12 @@ function ContactList({ searchInput, setInput, handleChat }) {
           cominatedId,
           photoUrl: ''
         });
-        const exitsChat = await getDoc(doc(db, 'userChat', cominatedId))
-        if (!exitsChat.exists()) {
-          await setDoc(doc(db, 'userChat', cominatedId), {
-            createrId: selector?.uid,
-            user1: [],
-            user2: [],
-          })
-        }
-        setLoading(false)
-        setInput('')
       }
     } catch (error) {
-      setLoading(false)
-      setInput('')
       console.error(error)
+    } finally {
+      setInput('')
+      setLoading(false)
     }
   }
   return (
@@ -101,7 +91,7 @@ function ContactList({ searchInput, setInput, handleChat }) {
       {searchContectList?.map((item, index) => (
         <div onClick={() => handleAddContact(item?.data())} key={index} className="flex gap-4 items-center ">
           {!item?.data()?.photoUrl ? (
-            <span className="nav_leftProfileIcon text-sm flex items-center justify-center">
+            <span className="nav_leftProfileIcon uppercase text-white text-sm flex items-center justify-center">
               <span>{item?.data()?.email[0]}</span>
             </span>
           ) : (
@@ -136,7 +126,7 @@ function ContactList({ searchInput, setInput, handleChat }) {
       {contectList?.map((item, index) => (
         <div onClick={() => handleChat(item)} key={index} className="flex border-b border-slate-400 pb-2 gap-4 items-center">
           {!item?.photoUrl ? (
-            <span className="nav_leftProfileIcon text-sm flex items-center justify-center">
+            <span className="nav_leftProfileIcon text-white uppercase  text-sm flex items-center justify-center">
               <span>{item?.email[0]}</span>
             </span>
           ) : (

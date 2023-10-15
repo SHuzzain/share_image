@@ -77,7 +77,7 @@ function SignIn() {
           }
         } finally {
           setLoading(false);
-          reset()
+          setValue('password', '')
         }
 
         break;
@@ -115,7 +115,7 @@ function SignIn() {
             navigate("..");
           })
           .finally(() => {
-            reset()
+            setValue('password', '')
             setLoading(false);
           });
         break;
@@ -123,8 +123,6 @@ function SignIn() {
         break;
     }
   };
-
-
 
   return (
     <div div className="h-screen flex items-center justify-center bg-white px-2 py-1 bg-gradient-to-c from-yellow-300 from-50% to-black to-50%" >
@@ -210,7 +208,7 @@ function SignIn() {
                 <input
                   className="w-3 cursor-pointer accent-yellow-300"
                   type="checkbox"
-                  name=""
+                  name="terms"
                   id="terms"
                 />
                 <p className="mix-blend-difference text-yellow-300 ">

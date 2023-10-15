@@ -5,9 +5,11 @@ import { useDispatch } from "react-redux";
 import { login, logout, tokenCheck } from "../feature/userSlice";
 import { onAuthStateChanged } from "firebase/auth";
 import { getAuthExpirationData, getAuthToken } from "../pages/auth/authInfoSet";
-import { auth, AuthStatusChange, db, signOut } from "../firebase";
+import { auth, AuthStatusChange, db, realtimeDb, signOut } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { MessageAside } from "../components/messageSystem/MessageAside";
+import { ref, set } from "firebase/database";
+
 
 function RootLayout() {
   const dispatch = useDispatch();
@@ -24,7 +26,7 @@ function RootLayout() {
             accessToken: null,
           })
         );
-
+        authSts?.uid && statusChange(false)
         navigate("/");
       } else {
         setTimeout(() => {
@@ -47,29 +49,55 @@ function RootLayout() {
         );
       }
     });
+
     return unSub;
   }, [authSts]);
 
-  const handleBeforeUnload = async (status) => {
-    if (!authSts?.uid) return;
+  async function statusChange(status) {
+    await set(ref(realtimeDb, 'users/' + authSts?.uid), {
+      online: status
+    })
+  }
 
-    await updateDoc(doc(db, "user", authSts?.uid), {
-      online: status,
-    });
+  const handleBeforeUnload = async (status) => {
+    if (!authSts?.uid) return null;
+    statusChange(status)
   };
 
+  const handleAwayTab = async (status) => {
+
+    try {
+      if (document.visibilityState === 'visible' && authSts?.uid) {
+        statusChange(status)
+      } else if (authSts?.uid) {
+        statusChange(status)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
-    handleBeforeUnload(true);
-
-    window.addEventListener("beforeunload", () => handleBeforeUnload(false));
-
+    handleBeforeUnload(!!authSts?.uid);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState == "visible") {
+        handleAwayTab(true)
+      } else {
+        handleAwayTab('away')
+      }
+    });
+    window.addEventListener('beforeunload', () => handleBeforeUnload(false))
     return () => {
-      window.removeEventListener("beforeunload", () =>
-        handleBeforeUnload(false)
-      );
-      handleBeforeUnload(false);
-    };
-  }, []);
+      document.removeEventListener('visibilitychange', () => {
+        if (document.visibilityState == "visible") {
+          handleAwayTab(true)
+        } else {
+          handleAwayTab('away')
+        }
+      })
+      window.addEventListener('beforeunload', () => handleBeforeUnload(false))
+    }
+  }, [authSts?.uid]);
 
   return (
     <>
